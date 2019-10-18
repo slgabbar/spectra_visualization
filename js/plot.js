@@ -103,10 +103,9 @@ function brushed() {
   });
 
   points.then(function(data) {
-    // We can create our 400 section array from start point
-    // Then we can do something with it
-    var test = 5;
-    do_something(test);
+    // model_input is the array of length 400 from the start point.
+    model_input = slice_array(data, start);
+    console.log(model_input);
   })
 
 
@@ -129,6 +128,7 @@ function type(d) {
   return d;
 }
 
-function do_something(something) {
-  console.log(something+10);
+function slice_array(data, start) {
+  new_data = data.slice(start, start+400);
+  return new_data;
 };
