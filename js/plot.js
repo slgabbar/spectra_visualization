@@ -41,7 +41,6 @@ var context = svg.append("g")
     .attr("class", "context")
     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-
 d3.csv("data/flux.csv", type)
     .then(function(data) {
 
@@ -50,7 +49,7 @@ d3.csv("data/flux.csv", type)
       x2.domain(x.domain());
       y2.domain(y.domain());
 
-      console.log(x.domain());
+      // console.log(x.domain());
 
       focus.append("path")
           .datum(data)
@@ -95,7 +94,24 @@ function brushed() {
   var start = Math.floor(s.map(x2.invert, x2)[0]);
   var end = start + 400
 
-  console.log(start)
+
+  var dataset = d3.csv("data/flux.csv");
+  var points = dataset.then(function(value) {
+    return Promise.all(value.map(function(results){
+      return [results.wave, results.flux];
+    }))
+  });
+
+  points.then(function(data) {
+    // We can create our 400 section array from start point
+    // Then we can do something with it
+    var test = 5;
+    do_something(test);
+  })
+
+
+
+  // console.log(start)
   x.domain([start, end]);
   focus.select(".line").attr("d", line);
   focus.select(".axis--x").call(xAxis);
@@ -112,3 +128,7 @@ function type(d) {
   d.flux = +d.flux;
   return d;
 }
+
+function do_something(something) {
+  console.log(something+10);
+};
