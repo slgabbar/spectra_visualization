@@ -12,7 +12,8 @@ var x = d3.scaleLinear().range([0, width]),
 
 var xAxis = d3.axisBottom(x),
     xAxis2 = d3.axisBottom(x2),
-    yAxis = d3.axisLeft(y);
+    yAxis = d3.axisLeft(y),
+    yAxis2 = d3.axisLeft(y2);
 
 var brush = d3.brushX()
     .extent([[0, 0], [width, height2]])
@@ -23,8 +24,8 @@ var line = d3.line()
     .y(function(d) { return y(d.flux); });
 
 var line2 = d3.line()
-    .x(function(d) { return x(d.wave); })
-    .y(function(d) { return y(d.flux); });
+    .x(function(d) { return x2(d.wave); })
+    .y(function(d) { return y2(d.flux); });
 
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -71,6 +72,10 @@ d3.csv("data/flux.csv", type, function(error, data) {
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height2 + ")")
       .call(xAxis2);
+
+  // context.append("g")
+  //     .attr("class", "axis axis--y")
+  //     .call(yAxis2);
 
   context.append("g")
       .attr("class", "brush")
