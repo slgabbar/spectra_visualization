@@ -12,9 +12,9 @@ var x = d3.scaleLinear().range([0, width]),
 
 var xAxis = d3.axisBottom(x),
     xAxis2 = d3.axisBottom(x2),
-    yAxis = d3.axisLeft(y),
-    yAxis2 = d3.axisLeft(y2);
+    yAxis = d3.axisLeft(y);
 
+// Sets where brush can pan over.
 var brush = d3.brushX()
     .extent([[0, 0], [width, height2]])
     .on("brush end", brushed);
@@ -29,7 +29,7 @@ var line2 = d3.line()
 
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
-  .append("rect")
+    .append("rect")
     .attr("width", width)
     .attr("height", height);
 
@@ -41,7 +41,7 @@ var context = svg.append("g")
     .attr("class", "context")
     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-d3.csv("data/flux.csv", type, function(error, data) {
+d3.csv("data/flux_wave.csv", type, function(error, data) {
   if (error) throw error;
 
   x.domain(d3.extent(data, function(d) { return d.wave; }));
@@ -73,10 +73,7 @@ d3.csv("data/flux.csv", type, function(error, data) {
       .attr("transform", "translate(0," + height2 + ")")
       .call(xAxis2);
 
-  // context.append("g")
-  //     .attr("class", "axis axis--y")
-  //     .call(yAxis2);
-
+  // brush range seems best [0, 78.2]
   context.append("g")
       .attr("class", "brush")
       .call(brush)
@@ -84,11 +81,20 @@ d3.csv("data/flux.csv", type, function(error, data) {
 });
 
 function brushed() {
-  if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+  // if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
   var s = d3.event.selection || x2.range();
-  x.domain(s.map(x2.invert, x2));
+
+  // get begining of focused axis, set end to +400 to match input of spectra
+  var start = Math.floor(s.map(x2.invert, x2)[0]);
+  var end = start + 400
+
+  x.domain([start, end]);
   focus.select(".line").attr("d", line);
   focus.select(".axis--x").call(xAxis);
+
+  console.log(start);
+
+
 
   // removes handle to resize the brush
   d3.selectAll('.brush>.handle').remove();
@@ -102,3 +108,4 @@ function type(d) {
   d.flux = +d.flux;
   return d;
 }
+
