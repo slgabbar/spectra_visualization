@@ -41,44 +41,51 @@ var context = svg.append("g")
     .attr("class", "context")
     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-d3.csv("data/flux_wave.csv", type, function(error, data) {
-  if (error) throw error;
 
-  x.domain(d3.extent(data, function(d) { return d.wave; }));
-  y.domain([d3.min(data, function(d) { return d.flux; }) - .05, d3.max(data, function(d) { return d.flux; })]);
-  x2.domain(x.domain());
-  y2.domain(y.domain());
+d3.csv("data/flux.csv", type)
+    .then(function(data) {
 
-  focus.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", line);
+      x.domain(d3.extent(data, function(d) { return d.wave; }));
+      y.domain([d3.min(data, function(d) { return d.flux; }) - .05, d3.max(data, function(d) { return d.flux; })]);
+      x2.domain(x.domain());
+      y2.domain(y.domain());
 
-  focus.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+      console.log(x.domain());
 
-  focus.append("g")
-      .attr("class", "axis axis--y")
-      .call(yAxis);
+      focus.append("path")
+          .datum(data)
+          .attr("class", "line")
+          .attr("d", line);
 
-  context.append("path")
-      .datum(data)
-      .attr("class", "line")
-      .attr("d", line2);
+      focus.append("g")
+          .attr("class", "axis axis--x")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
 
-  context.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height2 + ")")
-      .call(xAxis2);
+      focus.append("g")
+          .attr("class", "axis axis--y")
+          .call(yAxis);
 
-  // brush range seems best [0, 78.2]
-  context.append("g")
-      .attr("class", "brush")
-      .call(brush)
-      .call(brush.move, [0, 78.2]);
-});
+      context.append("path")
+          .datum(data)
+          .attr("class", "line")
+          .attr("d", line2);
+
+      context.append("g")
+          .attr("class", "axis axis--x")
+          .attr("transform", "translate(0," + height2 + ")")
+          .call(xAxis2);
+
+      // brush range seems best [0, 78.2]
+      context.append("g")
+          .attr("class", "brush")
+          .call(brush)
+          .call(brush.move, [0, 78.2]);
+
+    })
+    .catch(function(error){
+
+    })
 
 function brushed() {
   // if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
@@ -88,13 +95,10 @@ function brushed() {
   var start = Math.floor(s.map(x2.invert, x2)[0]);
   var end = start + 400
 
+  console.log(start)
   x.domain([start, end]);
   focus.select(".line").attr("d", line);
   focus.select(".axis--x").call(xAxis);
-
-  console.log(start);
-
-
 
   // removes handle to resize the brush
   d3.selectAll('.brush>.handle').remove();
@@ -108,4 +112,3 @@ function type(d) {
   d.flux = +d.flux;
   return d;
 }
-
