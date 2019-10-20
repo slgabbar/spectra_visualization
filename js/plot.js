@@ -1,3 +1,9 @@
+var e = document.getElementById("layers");
+var layer = e.options[e.selectedIndex].value;
+console.log(layer);
+
+
+
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 110, left: 40},
     margin2 = {top: 430, right: 20, bottom: 30, left: 40},
@@ -6,7 +12,7 @@ var svg = d3.select("svg"),
     height2 = +svg.attr("height") - margin2.top - margin2.bottom;
 
 var xs = range(134),
-    x_pos = 0;
+    x_pos = 66;
 
 var x = d3.scaleLinear().range([0, width]),
     x2 = d3.scaleLinear().range([0, width]),
@@ -33,7 +39,7 @@ var line2 = d3.line()
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
     .append("rect")
-    .attr("width", width + 40)
+    .attr("width", width)
     .attr("height", height);
 
 var focus = svg.append("g")
@@ -42,7 +48,7 @@ var focus = svg.append("g")
 
 var pointer = focus.append("svg")
     .attr("class", "pointer_container")
-    .attr("viewBox", "0, 34, 134, 1")
+    .attr("viewBox", "0, 36.7, 143, 1")
 
 pointer.selectAll('rect')
     .data(xs)
@@ -50,7 +56,7 @@ pointer.selectAll('rect')
     .append('rect')
     .attr("x", function(d) { return d; })
     .attr("width", 1)
-    .attr("height", 51)
+    .attr("height", 55)
     .attr("class", function(d) {
       if (d == x_pos) {
         return "selected";
@@ -58,6 +64,8 @@ pointer.selectAll('rect')
       else { return "unselected"; }
     })
     .on("mouseover", function(d) {
+
+      // console.log(d);
 
       pointer.selectAll('rect')
           .attr('class', 'unselected');
