@@ -5,6 +5,9 @@ var svg = d3.select("svg"),
     height = +svg.attr("height") - margin.top - margin.bottom,
     height2 = +svg.attr("height") - margin2.top - margin2.bottom;
 
+var xs = range(134),
+    x_pos = 0;
+
 var x = d3.scaleLinear().range([0, width]),
     x2 = d3.scaleLinear().range([0, width]),
     y = d3.scaleLinear().range([height, 0]),
@@ -30,12 +33,38 @@ var line2 = d3.line()
 svg.append("defs").append("clipPath")
     .attr("id", "clip")
     .append("rect")
-    .attr("width", width)
+    .attr("width", width + 40)
     .attr("height", height);
 
 var focus = svg.append("g")
     .attr("class", "focus")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var pointer = focus.append("svg")
+    .attr("class", "pointer_container")
+    .attr("viewBox", "0, 34, 134, 1")
+
+pointer.selectAll('rect')
+    .data(xs)
+    .enter()
+    .append('rect')
+    .attr("x", function(d) { return d; })
+    .attr("width", 1)
+    .attr("height", 51)
+    .attr("class", function(d) {
+      if (d == x_pos) {
+        return "selected";
+      }
+      else { return "unselected"; }
+    })
+    .on("mouseover", function(d) {
+
+      pointer.selectAll('rect')
+          .attr('class', 'unselected');
+
+      d3.select(this)
+        .attr("class", "selected");
+    });
 
 var context = svg.append("g")
     .attr("class", "context")
@@ -48,8 +77,6 @@ d3.csv("data/flux.csv", type)
       y.domain([d3.min(data, function(d) { return d.flux; }) - .05, d3.max(data, function(d) { return d.flux; })]);
       x2.domain(x.domain());
       y2.domain(y.domain());
-
-      // console.log(x.domain());
 
       focus.append("path")
           .datum(data)
@@ -105,10 +132,8 @@ function brushed() {
   points.then(function(data) {
     // model_input is the array of length 400 from the start point.
     model_input = slice_array(data, start);
-    console.log(model_input);
+    // console.log(model_input);
   })
-
-
 
   // console.log(start)
   x.domain([start, end]);
@@ -132,3 +157,7 @@ function slice_array(data, start) {
   new_data = data.slice(start, start+400);
   return new_data;
 };
+
+function range(n) {
+  return Array(n).fill().map((_, i) => i);
+}

@@ -5,6 +5,24 @@
 	clip-path: url(#clip);
 }
 
+.pointer_container {
+	position: absolute;
+	border-radius: 8px;
+}
+
+.pointer_container rect {
+	opacity: 0;
+}
+
+.pointer_container .selected {
+	opacity: 1;
+	fill: none;
+	stroke: orange;
+	stroke-width: .5px;
+}
+
+
+
 /*
 .zoom {
   cursor: move;
