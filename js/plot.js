@@ -1,8 +1,18 @@
-var e = document.getElementById("layers");
-var layer = e.options[e.selectedIndex].value;
-console.log(layer);
+// Define which layer, get number of channels
+// and width the view box should be. and the
+// range of the rectangle spacing
+layer = 'pool2';
+layer_dims = num_channels(layer);
+n = layer_dims[0];
+w = layer_dims[1];
+r = layer_dims[2];
 
+console.log("Visualizing %s with %d channels.", layer, n);
 
+// Create range between (0, num_channels)
+// For now leave the starting position always at 0
+var xs = range(n),
+    x_pos = 0;
 
 var svg = d3.select("svg"),
     margin = {top: 20, right: 20, bottom: 110, left: 40},
@@ -11,8 +21,6 @@ var svg = d3.select("svg"),
     height = +svg.attr("height") - margin.top - margin.bottom,
     height2 = +svg.attr("height") - margin2.top - margin2.bottom;
 
-var xs = range(134),
-    x_pos = 66;
 
 var x = d3.scaleLinear().range([0, width]),
     x2 = d3.scaleLinear().range([0, width]),
@@ -48,14 +56,15 @@ var focus = svg.append("g")
 
 var pointer = focus.append("svg")
     .attr("class", "pointer_container")
-    .attr("viewBox", "0, 36.7, 143, 1")
+    // .attr("viewBox", "0, 36.7, 143, 1");
+    .attr("viewBox", "0, 36.7, 143, 1");
 
 pointer.selectAll('rect')
     .data(xs)
     .enter()
     .append('rect')
     .attr("x", function(d) { return d; })
-    .attr("width", 1)
+    .attr("width", w)
     .attr("height", 55)
     .attr("class", function(d) {
       if (d == x_pos) {
@@ -65,7 +74,7 @@ pointer.selectAll('rect')
     })
     .on("mouseover", function(d) {
 
-      // console.log(d);
+      console.log(d/r);
 
       pointer.selectAll('rect')
           .attr('class', 'unselected');
@@ -140,7 +149,7 @@ function brushed() {
   points.then(function(data) {
     // model_input is the array of length 400 from the start point.
     model_input = slice_array(data, start);
-    // console.log(model_input);
+    console.log(model_input);
   })
 
   // console.log(start)
@@ -167,5 +176,19 @@ function slice_array(data, start) {
 };
 
 function range(n) {
-  return Array(n).fill().map((_, i) => i);
+  return Array(n).fill().map((_, i) => i*r);
+}
+
+function num_channels(layer) {
+  if (layer == 'conv1' || layer == 'conv1_relu') {
+    return [134, 1, 1];
+  } else if (layer == 'pool1' || layer == 'conv2' || layer == 'conv2_relu') {
+    return [34, 3.95, 3.95];
+  } else if (layer == 'pool2' || layer == 'conv3' || layer == 'conv3_relu') {
+    return [9, 14.9, 14.9];
+  } else if (layer == 'pool3') {
+    return [3, 44.7, 44.7];
+  } else {
+    alert("INVALID LAYER NAME");
+  }
 }
